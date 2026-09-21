@@ -308,6 +308,24 @@ th { font-weight: 400; color: var(--muted); }
 .wall .tl .mono { display: block; color: var(--muted); font-size: 12.5px; }
 @media (max-width: 640px) { .wall { grid-template-columns: 1fr 1fr; gap: 12px 10px; } }
 
+/* ---------- the whole set, lined up under the results ---------- */
+.wholeset { --setbox: 250px; margin-top: 40px; padding-top: 26px; border-top: 1px dotted var(--line); }
+.setrow { display: flex; align-items: flex-end; justify-content: center; gap: 22px; min-height: var(--setbox); }
+.setdoll { display: grid; justify-items: center; gap: 7px; text-decoration: none; color: var(--muted); }
+.setdoll img { height: calc(var(--setbox) * var(--rel)); width: calc(var(--setbox) * var(--rel) * var(--ar)); object-fit: contain; transition: transform 0.25s; }
+.setdoll:hover img { transform: translateY(-6px) rotate(-2deg); }
+.setdoll .cap { font-size: 12px; white-space: nowrap; }
+.setdoll .cap b { color: var(--accent); }
+.setdoll:hover .cap { color: var(--link); text-decoration: underline; }
+.wholeset figcaption { text-align: center; margin-top: 16px; }
+.wholeset .hand { display: block; margin-top: 2px; }
+@media (max-width: 640px) {
+  .wholeset { --setbox: 150px; }
+  .setrow { gap: 9px; }
+  .setdoll .cap { font-size: 0; }
+  .setdoll .cap b { font-size: 11px; }
+}
+
 /* ---------- 7 custom ---------- */
 .custom { display: grid; gap: 30px; margin-top: 6px; }
 .custom .tile { display: block; }
