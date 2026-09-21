@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=8">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -39,7 +39,7 @@
 
 <nav class="projects" aria-label="My CS180 projects">
   <span class="pl mono">CS180 projects</span>
-  <a href="https://sane24.github.io/Brand-New-Zoom/"><b class="mono">0</b> Brand New Zoom</a>
+  <a href="https://sane24.github.io/Brand-New-Zoom/" target="_blank" rel="noopener"><b class="mono">0</b> Brand New Zoom</a>
   <span class="here" aria-current="page"><b class="mono">1</b> Nested in Color</span>
 </nav>
 
@@ -89,6 +89,35 @@
       <span class="card-text"><b id="cardTitle">1 · The plate</b><span id="cardBody">One scan, three grey exposures stacked: blue, green, red.</span><span class="card-go">read the section →</span></span>
     </a>
   </div>
+  <figure class="wholeset">
+    <div class="setrow">
+    <a class="setdoll" href="#plate" style="--rel:1.0;--ar:0.5075">
+      <img src="assets/doll/d1.png" width="272" height="536" alt="Nesting doll 1 of 6">
+      <span class="cap"><b class="mono">1</b> The plate</span>
+    </a>
+    <a class="setdoll" href="#single" style="--rel:0.8284;--ar:0.5023">
+      <img src="assets/doll/d2.png" width="223" height="444" alt="Nesting doll 2 of 6">
+      <span class="cap"><b class="mono">2</b> Single-scale</span>
+    </a>
+    <a class="setdoll" href="#pyramid" style="--rel:0.6231;--ar:0.479">
+      <img src="assets/doll/d3.png" width="160" height="334" alt="Nesting doll 3 of 6">
+      <span class="cap"><b class="mono">3</b> Pyramid</span>
+    </a>
+    <a class="setdoll" href="#emir" style="--rel:0.4813;--ar:0.5233">
+      <img src="assets/doll/d4.png" width="135" height="258" alt="Nesting doll 4 of 6">
+      <span class="cap"><b class="mono">4</b> Sobel edges</span>
+    </a>
+    <a class="setdoll" href="#crop" style="--rel:0.3396;--ar:0.511">
+      <img src="assets/doll/d5.png" width="93" height="182" alt="Nesting doll 5 of 6">
+      <span class="cap"><b class="mono">5</b> Cropping</span>
+    </a>
+    <a class="setdoll" href="#results" style="--rel:0.2146;--ar:0.487">
+      <img src="assets/doll/d6.png" width="56" height="115" alt="Nesting doll 6 of 6">
+      <span class="cap"><b class="mono">6</b> Results</span>
+    </a>
+    </div>
+    <figcaption>The whole set at once. The animation above opens them one at a time, and each doll is a section of this page. <span class="hand">click any of them to jump back to that section</span></figcaption>
+  </figure>
 </section>
 
 <!-- ================================================ three exposures, added back together -->
@@ -329,7 +358,7 @@
     <a class="tile" href="assets/lg/tobolsk_cropped.jpg" data-title="Tobolsk" data-g="3, 3" data-r="3, 6" data-method="single-scale NCC · auto-crop"><img width="374" height="285" src="assets/img/tobolsk_cropped.jpg" alt="Tobolsk"><span class="tl">Tobolsk <span class="mono">G (3, 3) · R (3, 6)</span></span></a>
   </div>
 
-  <figure class="wholeset">
+  <figure class="wholeset wholeset--end">
     <div class="setrow">
     <a class="setdoll" href="#plate" style="--rel:1.0;--ar:0.5075">
       <img src="assets/doll/d1.png" width="272" height="536" alt="Nesting doll 1 of 6">
@@ -356,7 +385,7 @@
       <span class="cap"><b class="mono">6</b> Results</span>
     </a>
     </div>
-    <figcaption>All six, back in one line. Same trick as the plate: everything was inside the biggest one the whole time. <span class="hand">click any of them to jump back to that section</span></figcaption>
+    <figcaption>And back in one line. Same trick as the plate: everything was inside the biggest one the whole time. <span class="hand">click any of them to jump back to that section</span></figcaption>
   </figure>
 </section>
 
@@ -397,6 +426,6 @@
   <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next image">›</button>
 </dialog>
 
-<script src="script.js?v=8"></script>
+<script src="script.js?v=10"></script>
 </body>
 </html>

@@ -106,7 +106,7 @@
     function stopLoop() { if (timer) { clearTimeout(timer); timer = null; } looping = false; }
     function loop(state) {                     /* 0 -> 1 -> 2 -> 0 -> ... until someone presses a button */
       show(state);
-      var hold = state === 2 ? 3800 : 2600;    /* linger on the finished colour photo */
+      var hold = state === 2 ? 3400 : 2200;    /* linger on the finished colour photo */
       timer = setTimeout(function () { loop((state + 1) % 3); }, hold);
     }
     chips.forEach(function (c) { c.addEventListener('click', function () { userTook = true; stopLoop(); show(+c.getAttribute('data-state')); }); });
@@ -116,8 +116,8 @@
         if (!es[0].isIntersecting) { if (looping) stopLoop(); return; }   /* pause when scrolled away */
         if (userTook || looping || timer) return;                         /* a button press wins for good */
         looping = true;
-        timer = setTimeout(function () { loop(1); }, 1600);
-      }, { threshold: 0.45 });
+        timer = setTimeout(function () { loop(1); }, 400);
+      }, { threshold: 0.2 });
       io.observe(fig);
     }
   })();
