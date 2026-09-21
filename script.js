@@ -116,7 +116,7 @@
         if (!es[0].isIntersecting) { if (looping) stopLoop(); return; }   /* pause when scrolled away */
         if (userTook || looping || timer) return;                         /* a button press wins for good */
         looping = true;
-        timer = setTimeout(function () { loop(1); }, 400);
+        timer = setTimeout(function () { loop(1); }, 900);
       }, { threshold: 0.2 });
       io.observe(fig);
     }
