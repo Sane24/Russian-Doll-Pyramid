@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nested in Color · CS180 Project 1</title>
+<meta name="description" content="CS180 Project 1: colorizing the Prokudin-Gorskii glass plate collection with NCC alignment, an image pyramid, Sobel edges and automatic cropping.">
+<link rel="canonical" href="https://sane24.github.io/Russian-Doll-Pyramid">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=7">
+</head>
+<body>
+
+<!-- shared SVG: the registration icon used in headings -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="regIcon" viewBox="0 0 30 22">
+      <rect x="1" y="1" width="18" height="14" fill="none" stroke="#2f5fb3" stroke-width="1.6"/>
+      <rect x="5" y="4" width="18" height="14" fill="none" stroke="#3f8a3c" stroke-width="1.6"/>
+      <rect x="9" y="7" width="18" height="14" fill="none" stroke="#b23a2f" stroke-width="1.6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- the background: three misregistered doll ghosts, slowly drifting back into alignment -->
+<div class="bg" aria-hidden="true">
+  <div class="ghost ghost-b"></div>
+  <div class="ghost ghost-g"></div>
+  <div class="ghost ghost-r"></div>
+</div>
+
+<header class="topbar">
+  <a href="#top">Nested in Color</a>
+  <a class="url" href="https://sane24.github.io/Russian-Doll-Pyramid">https://sane24.github.io/Russian-Doll-Pyramid</a>
+</header>
+<div class="tricolor" aria-hidden="true"><i class="b"></i><i class="g"></i><i class="r"></i></div>
+
+<nav class="projects" aria-label="My CS180 projects">
+  <span class="pl mono">CS180 projects</span>
+  <a href="https://sane24.github.io/Brand-New-Zoom/"><b class="mono">0</b> Brand New Zoom</a>
+  <span class="here" aria-current="page"><b class="mono">1</b> Nested in Color</span>
+</nav>
+
+<main class="page" id="top">
+
+<!-- ================================================ hero: title + the doll -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="kicker mono">CS180 · Project 1 · Fall 2026 · <a href="https://sane24.github.io/Russian-Doll-Pyramid">sane24.github.io/Russian-Doll-Pyramid</a></p>
+    <h1 class="title">Nested in Color</h1>
+    <p class="sub">Colorizing the Prokudin-Gorskii glass plates with alignment, an image pyramid, and edges.</p>
+    <p class="hero-note">Every plate is three grey photos nested in one file, and the pyramid is one photo nested at five sizes. So the table of contents is a nesting doll: six dolls, one inside the other, one per section. Open it, or hover the list.</p>
+    <ol class="stages" id="stages">
+      <li class="stage" data-k="0"><a href="#plate"><img class="mini" src="assets/doll/d1.png" width="272" height="536" alt=""><span class="k mono">1</span>The plate</a></li>
+      <li class="stage" data-k="1"><a href="#single"><img class="mini" src="assets/doll/d2.png" width="223" height="444" alt=""><span class="k mono">2</span>Single-scale alignment</a></li>
+      <li class="stage" data-k="2"><a href="#pyramid"><img class="mini" src="assets/doll/d3.png" width="160" height="334" alt=""><span class="k mono">3</span>Image pyramid</a></li>
+      <li class="stage" data-k="3"><a href="#emir"><img class="mini" src="assets/doll/d4.png" width="135" height="258" alt=""><span class="k mono">4</span>Emir and Sobel edges</a></li>
+      <li class="stage" data-k="4"><a href="#crop"><img class="mini" src="assets/doll/d5.png" width="93" height="182" alt=""><span class="k mono">5</span>Automatic cropping</a></li>
+      <li class="stage" data-k="5"><a href="#results"><img class="mini" src="assets/doll/d6.png" width="56" height="115" alt=""><span class="k mono">6</span>Results</a></li>
+    </ol>
+  </div>
+  <div class="stage-box" id="dollStage">
+    <span class="regmark tl"></span><span class="regmark tr"></span><span class="regmark bl"></span><span class="regmark br"></span>
+    <div class="nest" id="nest">
+      <button type="button" class="dolly is-current" data-k="0" style="--rel:1.0;--ar:0.5075" aria-label="Nesting doll 1 of 6: The plate. Click to open it." tabindex="0">
+        <span class="doll-img"><img class="top" src="assets/doll/d1.png" width="272" height="536" alt=""><img class="bot" src="assets/doll/d1.png" width="272" height="536" alt=""></span>
+      </button>
+      <button type="button" class="dolly" data-k="1" style="--rel:0.8284;--ar:0.5023" aria-label="Nesting doll 2 of 6: Single-scale alignment. Click to open it." tabindex="-1">
+        <span class="doll-img"><img class="top" src="assets/doll/d2.png" width="223" height="444" alt=""><img class="bot" src="assets/doll/d2.png" width="223" height="444" alt=""></span>
+      </button>
+      <button type="button" class="dolly" data-k="2" style="--rel:0.6231;--ar:0.479" aria-label="Nesting doll 3 of 6: Image pyramid. Click to open it." tabindex="-1">
+        <span class="doll-img"><img class="top" src="assets/doll/d3.png" width="160" height="334" alt=""><img class="bot" src="assets/doll/d3.png" width="160" height="334" alt=""></span>
+      </button>
+      <button type="button" class="dolly" data-k="3" style="--rel:0.4813;--ar:0.5233" aria-label="Nesting doll 4 of 6: Emir and Sobel edges. Click to open it." tabindex="-1">
+        <span class="doll-img"><img class="top" src="assets/doll/d4.png" width="135" height="258" alt=""><img class="bot" src="assets/doll/d4.png" width="135" height="258" alt=""></span>
+      </button>
+      <button type="button" class="dolly" data-k="4" style="--rel:0.3396;--ar:0.511" aria-label="Nesting doll 5 of 6: Automatic cropping. Click to open it." tabindex="-1">
+        <span class="doll-img"><img class="top" src="assets/doll/d5.png" width="93" height="182" alt=""><img class="bot" src="assets/doll/d5.png" width="93" height="182" alt=""></span>
+      </button>
+      <button type="button" class="dolly" data-k="5" style="--rel:0.2146;--ar:0.487" aria-label="Nesting doll 6 of 6: Results. Click to open it." tabindex="-1">
+        <span class="doll-img"><img class="top" src="assets/doll/d6.png" width="56" height="115" alt=""><img class="bot" src="assets/doll/d6.png" width="56" height="115" alt=""></span>
+      </button>
+    </div>
+    <p class="doll-hint hand" id="dollHint">click to open</p>
+    <a class="card" id="dollCard" href="#plate">
+      <img id="cardImg" src="assets/plate/cathedral_plate.jpg" width="390" height="1024" alt="">
+      <span class="card-text"><b id="cardTitle">1 · The plate</b><span id="cardBody">One scan, three grey exposures stacked: blue, green, red.</span><span class="card-go">read the section →</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- ================================================ three exposures, added back together -->
+<figure class="layers wide" id="layers" data-state="0">
+  <div class="layers-box">
+    <div class="layer layer-b" style="--tx:-60%;--ty:0;--s:.55"><img src="assets/img/flower_b.jpg" width="900" height="768" alt="Flowers, blue-filter exposure, tinted blue"></div>
+    <div class="layer layer-g" style="--tx:0;--ty:0;--s:.55"><img src="assets/img/flower_g.jpg" width="900" height="768" alt="Flowers, green-filter exposure, tinted green"></div>
+    <div class="layer layer-r" style="--tx:60%;--ty:0;--s:.55"><img src="assets/img/flower_r.jpg" width="900" height="768" alt="Flowers, red-filter exposure, tinted red"></div>
+  </div>
+  <div class="layers-buttons" role="group" aria-label="Stack the three exposures">
+    <button type="button" class="chip is-on" data-state="0">three exposures</button>
+    <button type="button" class="chip" data-state="1">stacked as scanned</button>
+    <button type="button" class="chip" data-state="2">aligned</button>
+  </div>
+  <figcaption id="layersCap">The three exposures of the flowers, tinted the way their filters saw them. Add them up and you get color; that's the whole trick. But stack them exactly as scanned and every edge splits, because the camera moved a little between shots.</figcaption>
+</figure>
+
+<!-- ================================================ the pyramid banner -->
+<figure class="banner wide">
+  <div class="levels">
+    <a class="lvl tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656" style="--w:2.9%"><img src="assets/thumb/flower_cropped.jpg" width="480" height="398" alt=""><span class="mono">1/16</span></a>
+    <a class="lvl tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656" style="--w:5.75%"><img src="assets/thumb/flower_cropped.jpg" width="480" height="398" alt=""><span class="mono">1/8</span></a>
+    <a class="lvl tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656" style="--w:11.5%"><img src="assets/thumb/flower_cropped.jpg" width="480" height="398" alt=""><span class="mono">1/4</span></a>
+    <a class="lvl tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656" style="--w:23%"><img src="assets/img/flower_cropped.jpg" width="1400" height="1162" alt=""><span class="mono">1/2</span></a>
+    <a class="lvl tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656" style="--w:46%"><img src="assets/img/flower_cropped.jpg" width="1400" height="1162" alt="Flowers in a dark vase on a red cloth, reconstructed in color"><span class="mono">full · 3471 × 2881</span></a>
+  </div>
+  <figcaption>Flowers (LoC prok.01656, one of the plates I picked), at the five sizes the pyramid works through. The search starts on the smallest one. <span class="hand">← at 1/16 the whole channel is 236 px wide, and that's enough to find the answer</span></figcaption>
+</figure>
+
+<!-- ================================================ 1 plate -->
+<section id="plate">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>1. The plate</h2>
+  <p>Each scan is one tall grey image with three exposures stacked top to bottom: blue, green, red. I cut it into thirds, keep blue fixed, shift green and red until they line up with blue, and stack the three as RGB. Every offset on this page is (x, y) in pixels, the amount a channel was moved to land on blue.</p>
+  <div class="plate-row">
+    <figure class="plate-fig">
+      <div class="plate-img">
+        <img src="assets/plate/cathedral_plate.jpg" width="390" height="1024" alt="Raw cathedral scan: three grey exposures of the same hillside church stacked vertically">
+        <span class="plate-tag plate-tag--b mono">B · reference</span>
+        <span class="plate-tag plate-tag--g mono">G</span>
+        <span class="plate-tag plate-tag--r mono">R</span>
+      </div>
+      <figcaption>cathedral.jpg, 390 × 1024, three 341-row frames</figcaption>
+    </figure>
+    <figure class="viewer" id="viewer">
+      <div class="viewer-frame"><img id="viewerImg" src="assets/img/cathedral_b.jpg" width="390" height="341" alt="Cathedral, blue-filter exposure"></div>
+      <div class="viewer-buttons" role="group" aria-label="Show a channel">
+        <button type="button" class="chip chip-b is-on" data-src="assets/img/cathedral_b.jpg" data-cap="Blue-filter exposure. This one stays put.">B</button>
+        <button type="button" class="chip chip-g" data-src="assets/img/cathedral_g.jpg" data-cap="Green-filter exposure, shot a moment later.">G</button>
+        <button type="button" class="chip chip-r" data-src="assets/img/cathedral_r.jpg" data-cap="Red-filter exposure. Same scene, brightness differs.">R</button>
+        <button type="button" class="chip" data-src="assets/img/cathedral_unaligned.jpg" data-cap="Stacked as-is: every edge has a colored ghost.">stack</button>
+        <button type="button" class="chip" data-src="assets/img/cathedral_single_scale.jpg" data-cap="After moving G by (2, 5) and R by (3, 12).">aligned</button>
+      </div>
+      <figcaption id="viewerCap">Blue-filter exposure. This one stays put.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================================================ 2 single scale -->
+<section id="single">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>2. Single-scale alignment</h2>
+  <p>For the small JPEGs I try every shift (dx, dy) with both coordinates in [−15, 15], roll the channel by it with np.roll, and score it against blue with normalized cross-correlation: subtract each image's mean, divide by the norms, take the dot product. Higher is better. I only score the middle 80% of the frame, so plate borders and wrapped-around pixels don't get a vote. That's 31 × 31 = 961 candidates per channel.</p>
+  <p class="formula mono">NCC(a, b) = ⟨a − ā, b − b̄⟩ / ( ‖a − ā‖ · ‖b − b̄‖ )</p>
+  <div class="three">
+    <figure><a class="tile" href="assets/lg/cathedral_cropped.jpg" data-title="Cathedral" data-g="2, 5" data-r="3, 12" data-method="single-scale NCC, ±15 px"><img src="assets/img/cathedral_single_scale.jpg" width="390" height="341" alt="Cathedral, aligned"></a><figcaption>Cathedral <span class="mono">G (2, 5) · R (3, 12)</span></figcaption></figure>
+    <figure><a class="tile" href="assets/lg/monastery_cropped.jpg" data-title="Monastery" data-g="2, −3" data-r="2, 3" data-method="single-scale NCC, ±15 px"><img src="assets/img/monastery_single_scale.jpg" width="391" height="341" alt="Monastery, aligned"></a><figcaption>Monastery <span class="mono">G (2, −3) · R (2, 3)</span></figcaption></figure>
+    <figure><a class="tile" href="assets/lg/tobolsk_cropped.jpg" data-title="Tobolsk" data-g="3, 3" data-r="3, 6" data-method="single-scale NCC, ±15 px"><img src="assets/img/tobolsk_single_scale.jpg" width="396" height="341" alt="Tobolsk, aligned"></a><figcaption>Tobolsk <span class="mono">G (3, 3) · R (3, 6)</span></figcaption></figure>
+  </div>
+  <figure class="search-fig">
+    <svg class="search-grid" id="searchGrid" viewBox="0 0 250 250" role="img" aria-label="A 31 by 31 grid of candidate shifts from minus 15 to plus 15; the cell dx = 3, dy = 12 is marked as the winner for the cathedral's red channel"></svg>
+    <figcaption class="hand">the 961 candidates for Cathedral's red channel. the red cell, (3, 12), won.</figcaption>
+  </figure>
+</section>
+
+<!-- ================================================ 3 pyramid -->
+<section id="pyramid">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>3. Image pyramid</h2>
+  <p>The TIFFs are about 3700 × 3200 px per channel and the shifts reach 177 px, so searching at full resolution is out. Instead I halve the image (anti-aliased rescale) until its longest side is under 400 px, run the plain ±15 search there, and hand the answer back up: at each level, double the previous estimate, then check only ±2 px around it. Emir gets five levels, 1/16 to full. The whole run costs 961 + 4 × 25 correlations instead of tens of thousands.</p>
+
+  <figure class="giza wide">
+    <img class="giza-bg" src="assets/doll/giza.jpg" width="1400" height="669" alt="The pyramids of Giza under a pale sky">
+    <div class="giza-stack" aria-hidden="true">
+      <img src="assets/pyr/emir_r_raw_L4.jpg" alt="" style="width:4%">
+      <img src="assets/pyr/emir_r_raw_L3.jpg" alt="" style="width:8%">
+      <img src="assets/pyr/emir_r_raw_L2.jpg" alt="" style="width:16%">
+      <img src="assets/pyr/emir_r_raw_L1.jpg" alt="" style="width:32%">
+      <img src="assets/pyr/emir_r_raw_L0.jpg" alt="" style="width:64%">
+    </div>
+    <figcaption>An image pyramid (Emir's red channel, the five real levels) in front of some regular pyramids. <span class="mono">Giza photo: CC0, Wikimedia Commons.</span></figcaption>
+  </figure>
+
+  <div class="pyr wide" id="pyrWidget">
+    <div class="pyr-stage">
+      <figure class="pyr-view">
+        <div class="pyr-frame" id="pyrFrame">
+          <img id="pyrImg" src="assets/pyr/emir_r_sobel_L4.jpg" width="232" height="200" alt="Emir's red channel as a Sobel edge map at 1/16 scale">
+          <div class="pyr-window" id="pyrWin" aria-hidden="true"><span class="mono" id="pyrWinLabel">±15 px</span></div>
+        </div>
+        <figcaption class="mono" id="pyrViewCap">red channel · Sobel edges · 1/16 · 232 × 200 px</figcaption>
+        <button class="pyr-toggle" id="pyrToggle" type="button" aria-pressed="true">showing edges (what the code compares) · switch to the photo</button>
+      </figure>
+      <div class="pyr-search">
+        <svg class="pyr-grid" id="pyrGrid" viewBox="0 0 264 264" role="img" aria-label="Grid of candidate shifts searched at this level"></svg>
+        <dl class="pyr-nums mono">
+          <div><dt>scale</dt><dd id="nScale">1/16</dd></div>
+          <div><dt>size</dt><dd id="nSize">232 × 200</dd></div>
+          <div><dt>predicted</dt><dd id="nPred">— (no guess yet)</dd></div>
+          <div><dt>search</dt><dd id="nSearch">±15 px · 961 candidates</dd></div>
+          <div><dt>chosen</dt><dd id="nChosen">(2, 7)</dd></div>
+          <div><dt>NCC</dt><dd id="nNcc">0.730</dd></div>
+        </dl>
+      </div>
+    </div>
+    <p class="pyr-say" id="pyrSay" aria-live="polite">Level 1 of 5. No guess yet, so search the whole ±15 window on the tiny image. Best: (2, 7).</p>
+    <div class="pyr-controls">
+      <button type="button" id="pyrPlay" class="btn btn--primary">▶ play all five</button>
+      <button type="button" id="pyrBack" class="btn">◀ back</button>
+      <span class="pyr-step mono" id="pyrStep">level 1 of 5 · scale 1/16</span>
+      <button type="button" id="pyrNext" class="btn">next ▶</button>
+      <button type="button" id="pyrReplay" class="btn">replay</button>
+    </div>
+    <svg class="pyr-map" id="pyrMap" viewBox="0 0 360 200" aria-label="Nested rectangles showing the five pyramid levels to scale; click one to jump to it"></svg>
+  </div>
+  <p class="hand pyr-measured">these are real numbers: my pyramid_align on emir.tif's red channel with a print statement added at each level. green ends at (24, 49) the same way.</p>
+
+  <div class="scroll"><table class="trace mono">
+    <caption>The same run as a table</caption>
+    <thead><tr><th>level</th><th>scale</th><th>size (px)</th><th>predicted</th><th>search</th><th>chosen</th><th>NCC</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>1/16</td><td>232 × 200</td><td>—</td><td>±15 (961)</td><td>(2, 7)</td><td>0.730</td></tr>
+      <tr><td>2</td><td>1/8</td><td>463 × 401</td><td>2 × (2, 7) = (4, 14)</td><td>±2 (25)</td><td>(5, 13)</td><td>0.725</td></tr>
+      <tr><td>3</td><td>1/4</td><td>926 × 802</td><td>(10, 26)</td><td>±2 (25)</td><td>(10, 27)</td><td>0.627</td></tr>
+      <tr><td>4</td><td>1/2</td><td>1851 × 1604</td><td>(20, 54)</td><td>±2 (25)</td><td>(20, 53)</td><td>0.559</td></tr>
+      <tr><td>5</td><td>1</td><td>3702 × 3209</td><td>(40, 106)</td><td>±2 (25)</td><td><b>(40, 107)</b></td><td>0.513</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================================================ 4 emir + sobel -->
+<section id="emir">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>4. Emir, and why raw pixels fail</h2>
+  <p>With NCC on raw pixels the pyramid works on ten of the eleven TIFFs. On Emir, green lands at (24, 49) but red goes to (−205, 141). The robe is bright under the blue filter and dark under the red one, so at the correct alignment the two channels nearly anti-correlate and a wrong shift scores better. The pyramid can't fix that: the 1/16 level already picks (−13, 9), and every level above just doubles it. Raw NCC scored 0.71 for green and 0.28 for red, which was the warning sign.</p>
+
+  <div class="compare-wrap wide">
+    <div class="compare" id="emirCompare" style="--pos:50%">
+      <img class="compare-under" src="assets/img/emir_aligned.jpg" width="1400" height="1214" alt="Emir aligned with the Sobel-edge pyramid: channels line up, the robe is blue">
+      <img class="compare-over" src="assets/img/emir_ncc.jpg" width="1400" height="1214" alt="Emir aligned with raw-pixel NCC: the red channel sits far to the left, a red ghost of the figure">
+      <div class="compare-handle" aria-hidden="true"><span></span></div>
+      <input class="compare-range" id="compareRange" type="range" min="0" max="100" value="50" aria-label="Drag to compare. Left: raw NCC. Right: Sobel edges.">
+      <span class="compare-tag compare-tag--l mono">raw NCC · R (−205, 141)</span>
+      <span class="compare-tag compare-tag--r mono">Sobel · R (40, 107)</span>
+    </div>
+    <div class="compare-buttons">
+      <button type="button" class="btn" data-pos="100">Raw NCC</button>
+      <button type="button" class="btn" data-pos="0">Sobel edges</button>
+      <span class="mono muted">or drag the line</span>
+    </div>
+  </div>
+
+  <h3 id="edges">Sobel edges instead of pixels</h3>
+  <p>Sobel gives gradient magnitude, which is the same whether an edge goes light-to-dark or dark-to-light. So I run sobel() on each channel, run the identical pyramid on the edge maps, and apply the resulting shifts to the original channels. Emir's red moves to (40, 107). On every other plate the offsets change by at most 4 px, which is why I hadn't noticed the problem earlier. All TIFF results below use this version.</p>
+  <div class="edges wide">
+    <figure><img src="assets/edges/emir_b_crop.jpg" width="800" height="800" alt="Blue channel detail: robe bright, embroidery dark"><figcaption>B channel: robe bright</figcaption></figure>
+    <figure><img src="assets/edges/emir_r_crop.jpg" width="800" height="800" alt="Red channel detail: robe dark, embroidery bright"><figcaption>R channel: robe dark, same fabric</figcaption></figure>
+    <figure><img src="assets/edges/emir_b_sobel_crop.jpg" width="800" height="800" alt="Sobel edge map of the blue channel"><figcaption>sobel(B)</figcaption></figure>
+    <figure><img src="assets/edges/emir_r_sobel_crop.jpg" width="800" height="800" alt="Sobel edge map of the red channel, same outlines"><figcaption>sobel(R): same lines</figcaption></figure>
+    <figure><img src="assets/edges/emir_color_crop.jpg" width="800" height="800" alt="The same detail aligned, in color"><figcaption>aligned</figcaption></figure>
+  </div>
+
+  <div class="scroll"><table class="ledger mono">
+    <caption>Both methods on every TIFF, (x, y) px. Raw NCC is the required baseline; Sobel is what the gallery shows.</caption>
+    <thead><tr><th>plate</th><th>raw NCC G</th><th>raw NCC R</th><th>Sobel G</th><th>Sobel R</th></tr></thead>
+    <tbody>
+      <tr><td>church</td><td>(4, 25)</td><td>(−4, 58)</td><td>(4, 25)</td><td>(−4, 58)</td></tr>
+      <tr class="is-bad"><td>emir</td><td>(24, 49)</td><td>(−205, 141)</td><td>(24, 49)</td><td>(40, 107)</td></tr>
+      <tr><td>harvesters</td><td>(17, 60)</td><td>(13, 124)</td><td>(17, 60)</td><td>(14, 124)</td></tr>
+      <tr><td>icon</td><td>(17, 41)</td><td>(23, 89)</td><td>(17, 42)</td><td>(23, 90)</td></tr>
+      <tr><td>ilemselga</td><td>(7, 40)</td><td>(11, 130)</td><td>(7, 40)</td><td>(11, 131)</td></tr>
+      <tr><td>melons</td><td>(11, 82)</td><td>(13, 178)</td><td>(10, 80)</td><td>(13, 177)</td></tr>
+      <tr><td>religious painting</td><td>(3, 28)</td><td>(7, 68)</td><td>(7, 30)</td><td>(6, 70)</td></tr>
+      <tr><td>self portrait</td><td>(29, 79)</td><td>(37, 176)</td><td>(29, 78)</td><td>(37, 176)</td></tr>
+      <tr><td>siren</td><td>(−6, 49)</td><td>(−25, 96)</td><td>(−6, 49)</td><td>(−24, 96)</td></tr>
+      <tr><td>three generations</td><td>(14, 53)</td><td>(11, 112)</td><td>(12, 54)</td><td>(9, 111)</td></tr>
+      <tr><td>wharf</td><td>(−7, 15)</td><td>(−16, 83)</td><td>(−7, 15)</td><td>(−16, 83)</td></tr>
+      <tr class="is-custom"><td>beard (mine)</td><td>(9, 42)</td><td>(16, 91)</td><td>(11, 38)</td><td>(15, 93)</td></tr>
+      <tr class="is-custom"><td>flower (mine)</td><td>(−4, 18)</td><td>(−14, 118)</td><td>(−3, 18)</td><td>(−14, 120)</td></tr>
+      <tr class="is-custom"><td>lab (mine)</td><td>(47, 52)</td><td>(77, 113)</td><td>(47, 51)</td><td>(77, 112)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================================================ 5 crop -->
+<section id="crop">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>5. Automatic cropping</h2>
+  <p>np.roll wraps the rows it pushes off one edge back in at the other, and the scans have thick borders. Two steps: first keep only the rectangle all three shifted channels cover (for Harvesters, with G at (17, 60) and R at (14, 124), that's right of column 17 and below row 124). Then convert to grey, run Sobel, average edge strength along every row and column, and in the outer 15% of each side cut just inside the strongest line, with a 1% margin. If that would remove more than 40% of either dimension, the code skips it and keeps the overlap-only crop.</p>
+  <div class="crop-grid wide">
+    <figure class="crop-before">
+      <div class="crop-stack">
+        <img src="assets/img/harvesters_aligned.jpg" width="1400" height="1223" alt="Harvesters aligned but uncropped: a colored stripe wrapped in at the top, black and white borders on the sides">
+        <svg class="crop-overlay" viewBox="0 0 3683 3218" aria-hidden="true">
+          <rect class="box-valid" x="17" y="124" width="3666" height="3094"/>
+          <rect class="box-final" x="119" y="223" width="3460" height="2932"/>
+        </svg>
+      </div>
+      <figcaption>Before, 3683 × 3218. Dashed: overlap of all three channels. Red: detected border crop. <span class="hand">↑ the 124 rows np.roll pushed off the bottom of red came back in at the top</span></figcaption>
+    </figure>
+    <figure class="crop-after">
+      <img src="assets/img/harvesters_cropped.jpg" width="1400" height="1186" alt="Harvesters after the automatic crop">
+      <figcaption>After, 3460 × 2932. <button type="button" class="linkbtn" id="cropToggle" aria-pressed="true">hide the boxes</button></figcaption>
+    </figure>
+  </div>
+  <figure class="caveat">
+    <div class="crop-stack">
+      <img src="assets/img/melons_aligned.jpg" width="1400" height="1204" alt="Melons uncropped, with the detected crop box cutting off the bottom of the scene">
+      <svg class="crop-overlay" viewBox="0 0 3770 3241" aria-hidden="true"><rect class="box-final" x="147" y="293" width="3490" height="2459"/></svg>
+    </div>
+    <figcaption>Where it overshoots: on Melons the strongest line in the bottom 15% was the stall's table, not the border, so the crop ate about 500 rows of cobblestones. A few results also keep a thin colored fringe on one side. I'd rather show that than hide it.</figcaption>
+  </figure>
+</section>
+
+<!-- ================================================ 6 results -->
+<section id="results">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>6. Results on the provided images</h2>
+  <p>All 14, with offsets. TIFFs: Sobel pyramid + auto-crop. JPEGs: single-scale. Click any image to enlarge. <span class="hand">hover one: that fringe is what misalignment looks like</span></p>
+  <div class="wall wide" id="wall">
+    <a class="tile" href="assets/lg/emir_cropped.jpg" data-title="Emir" data-g="24, 49" data-r="40, 107" data-method="Sobel pyramid · auto-crop" data-loc="prok.01886"><img width="1400" height="1217" src="assets/img/emir_cropped.jpg" alt="Emir of Bukhara"><span class="tl">Emir <span class="mono">G (24, 49) · R (40, 107)</span></span></a>
+    <a class="tile" href="assets/lg/church_cropped.jpg" data-title="Church" data-g="4, 25" data-r="−4, 58" data-method="Sobel pyramid · auto-crop" data-loc="prok.00907"><img width="1400" height="1249" src="assets/img/church_cropped.jpg" alt="Church"><span class="tl">Church <span class="mono">G (4, 25) · R (−4, 58)</span></span></a>
+    <a class="tile" href="assets/lg/harvesters_cropped.jpg" data-title="Harvesters" data-g="17, 60" data-r="14, 124" data-method="Sobel pyramid · auto-crop" data-loc="prok.01522"><img width="1400" height="1186" src="assets/img/harvesters_cropped.jpg" alt="Harvesters"><span class="tl">Harvesters <span class="mono">G (17, 60) · R (14, 124)</span></span></a>
+    <a class="tile" href="assets/lg/icon_cropped.jpg" data-title="Icon" data-g="17, 42" data-r="23, 90" data-method="Sobel pyramid · auto-crop" data-loc="prok.00415"><img width="1400" height="1062" src="assets/img/icon_cropped.jpg" alt="Icon"><span class="tl">Icon <span class="mono">G (17, 42) · R (23, 90)</span></span></a>
+    <a class="tile" href="assets/lg/ilemselga_cropped.jpg" data-title="Ilemselga" data-g="7, 40" data-r="11, 131" data-method="Sobel pyramid · auto-crop" data-loc="prok.00280"><img width="1400" height="1196" src="assets/img/ilemselga_cropped.jpg" alt="Ilemselga"><span class="tl">Ilemselga <span class="mono">G (7, 40) · R (11, 131)</span></span></a>
+    <a class="tile" href="assets/lg/melons_cropped.jpg" data-title="Melons" data-g="10, 80" data-r="13, 177" data-method="Sobel pyramid · auto-crop" data-loc="prok.01728"><img width="1400" height="986" src="assets/img/melons_cropped.jpg" alt="Melons"><span class="tl">Melons <span class="mono">G (10, 80) · R (13, 177)</span></span></a>
+    <a class="tile" href="assets/lg/religous_painting_cropped.jpg" data-title="Religious painting" data-g="7, 30" data-r="6, 70" data-method="Sobel pyramid · auto-crop" data-loc="prok.00126"><img width="1400" height="1184" src="assets/img/religous_painting_cropped.jpg" alt="Religious painting"><span class="tl">Religious painting <span class="mono">G (7, 30) · R (6, 70)</span></span></a>
+    <a class="tile" href="assets/lg/self_portrait_cropped.jpg" data-title="Self portrait" data-g="29, 78" data-r="37, 176" data-method="Sobel pyramid · auto-crop" data-loc="prok.01468"><img width="1400" height="1195" src="assets/img/self_portrait_cropped.jpg" alt="Self portrait"><span class="tl">Self portrait <span class="mono">G (29, 78) · R (37, 176)</span></span></a>
+    <a class="tile" href="assets/lg/siren_cropped.jpg" data-title="Siren" data-g="−6, 49" data-r="−24, 96" data-method="Sobel pyramid · auto-crop" data-loc="prok.00171"><img width="1400" height="1034" src="assets/img/siren_cropped.jpg" alt="Siren (lilacs)"><span class="tl">Siren <span class="mono">G (−6, 49) · R (−24, 96)</span></span></a>
+    <a class="tile" href="assets/lg/three_generations_cropped.jpg" data-title="Three generations" data-g="12, 54" data-r="9, 111" data-method="Sobel pyramid · auto-crop" data-loc="prok.00542"><img width="1400" height="1029" src="assets/img/three_generations_cropped.jpg" alt="Three generations"><span class="tl">Three generations <span class="mono">G (12, 54) · R (9, 111)</span></span></a>
+    <a class="tile" href="assets/lg/wharf_cropped.jpg" data-title="Wharf" data-g="−7, 15" data-r="−16, 83" data-method="Sobel pyramid · auto-crop" data-loc="prok.00274"><img width="1400" height="1227" src="assets/img/wharf_cropped.jpg" alt="Wharf"><span class="tl">Wharf <span class="mono">G (−7, 15) · R (−16, 83)</span></span></a>
+    <a class="tile" href="assets/lg/cathedral_cropped.jpg" data-title="Cathedral" data-g="2, 5" data-r="3, 12" data-method="single-scale NCC · auto-crop"><img width="366" height="307" src="assets/img/cathedral_cropped.jpg" alt="Cathedral"><span class="tl">Cathedral <span class="mono">G (2, 5) · R (3, 12)</span></span></a>
+    <a class="tile" href="assets/lg/monastery_cropped.jpg" data-title="Monastery" data-g="2, −3" data-r="2, 3" data-method="single-scale NCC · auto-crop"><img width="367" height="270" src="assets/img/monastery_cropped.jpg" alt="Monastery"><span class="tl">Monastery <span class="mono">G (2, −3) · R (2, 3)</span></span></a>
+    <a class="tile" href="assets/lg/tobolsk_cropped.jpg" data-title="Tobolsk" data-g="3, 3" data-r="3, 6" data-method="single-scale NCC · auto-crop"><img width="374" height="285" src="assets/img/tobolsk_cropped.jpg" alt="Tobolsk"><span class="tl">Tobolsk <span class="mono">G (3, 3) · R (3, 6)</span></span></a>
+  </div>
+</section>
+
+<!-- ================================================ 7 custom -->
+<section id="custom">
+  <h2><svg class="reg" aria-hidden="true"><use href="#regIcon"/></svg>7. Three plates I picked</h2>
+  <p>Downloaded from the Library of Congress as the same tall grey TIFFs and run through the same code, nothing changed.</p>
+  <div class="custom wide">
+    <figure>
+      <a class="tile" href="assets/lg/lab_cropped.jpg" data-title="Laboratory" data-g="47, 51" data-r="77, 112" data-method="Sobel pyramid · auto-crop" data-loc="prok.00068"><img src="assets/img/lab_cropped.jpg" width="1400" height="1177" alt="A laboratory: a bench crowded with glassware, hanging lamps, a wall clock"></a>
+      <figcaption>Laboratory <span class="mono">G (47, 51) · R (77, 112) · LoC prok.00068</span> The largest horizontal shift of anything I ran. The green cast is in the plate; I didn't color-correct anything.</figcaption>
+    </figure>
+    <figure>
+      <a class="tile" href="assets/lg/beard_cropped.jpg" data-title="Bearded man (painting)" data-g="11, 38" data-r="15, 93" data-method="Sobel pyramid · auto-crop" data-loc="prok.00129"><img src="assets/img/beard_cropped.jpg" width="1400" height="1237" alt="A round painted portrait of an elderly bearded man, photographed on an easel"></a>
+      <figcaption>Bearded man <span class="mono">G (11, 38) · R (15, 93) · LoC prok.00129</span> A painting on an easel, not a sitter. The crop missed the colored fringes on three sides.</figcaption>
+    </figure>
+    <figure>
+      <a class="tile" href="assets/lg/flower_cropped.jpg" data-title="Flowers" data-g="−3, 18" data-r="−14, 120" data-method="Sobel pyramid · auto-crop" data-loc="prok.01656"><img src="assets/img/flower_cropped.jpg" width="1400" height="1162" alt="Flowers in a vase on a red cloth"></a>
+      <figcaption>Flowers <span class="mono">G (−3, 18) · R (−14, 120) · LoC prok.01656</span> The one from the top of the page.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<footer class="foot">
+  <p>Python, NumPy, scikit-image. The matryoshka set is a product photo I cut out doll by doll; the Giza photo is CC0 from Wikimedia Commons.</p>
+  <p class="mono">CS180 · Fall 2026 · <a href="https://sane24.github.io/Russian-Doll-Pyramid">https://sane24.github.io/Russian-Doll-Pyramid</a> · <a href="#top">top ↑</a></p>
+</footer>
+
+</main>
+
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged image">
+  <button class="lb-close" id="lbClose" type="button" aria-label="Close">×</button>
+  <figure class="lb-fig">
+    <img id="lbImg" src="" alt="">
+    <figcaption class="lb-cap"><span class="lb-title" id="lbTitle"></span><span class="lb-meta mono" id="lbMeta"></span></figcaption>
+  </figure>
+  <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous image">‹</button>
+  <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next image">›</button>
+</dialog>
+
+<script src="script.js?v=7"></script>
+</body>
+</html>
